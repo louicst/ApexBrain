@@ -1,10 +1,9 @@
-# core/data_manager.py
-
 import fastf1
 import pandas as pd
 import numpy as np
 import logging
 import streamlit as st
+import os  # Required for directory management
 from datetime import timedelta
 
 # SETUP LOGGING
@@ -17,7 +16,15 @@ class DataManager:
     """
     def __init__(self, cache_dir='cache'):
         self.cache_dir = cache_dir
+        
+        # FIX: Programmatically create the cache directory if it doesn't exist
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir, exist_ok=True)
+            logging.info(f"📁 Created missing cache directory at: {cache_dir}")
+            
+        # Now enable the cache safely
         fastf1.Cache.enable_cache(cache_dir)
+        
         self.session = None
         self.laps = None
         self.telemetry_cache = {} # In-memory cache for speed
@@ -52,7 +59,6 @@ class DataManager:
     def get_driver_list(self):
         """Dynamic list of drivers for the current session."""
         if self.session is None: return []
-        # Return list of (Abbreviation, Full Name) tuples
         drivers = self.session.results
         return list(zip(drivers['Abbreviation'], drivers['FullName']))
 
@@ -66,24 +72,17 @@ class DataManager:
             return self.telemetry_cache[cache_key]
 
         try:
-            # Select Driver Laps
             d_laps = self.laps.pick_driver(driver)
             
-            # Select Specific Lap or Fastest Lap
             if lap_number:
                 lap = d_laps[d_laps['LapNumber'] == lap_number].iloc[0]
             else:
                 lap = d_laps.pick_fastest()
 
-            # Load Telemetry
             tel = lap.get_telemetry()
             
-            # ENGINEERING CALCULATIONS (Vectorized)
-            # 1. Add Distance delta for interpolation
             tel['DistanceDelta'] = tel['Distance'].diff().fillna(0)
             
-            # 2. Smooth Speed (Savitzky-Golay)
-            # PRO FIX: Dynamic window size based on data length to prevent errors on short laps
             window = min(9, len(tel))
             if window > 3:
                 from scipy.signal import savgol_filter
@@ -91,12 +90,9 @@ class DataManager:
             else:
                 tel['Speed_Smooth'] = tel['Speed']
 
-            # 3. Derive Accelerations (G-Forces)
-            # a = dv/dt
             tel['TimeSec'] = tel['Time'].dt.total_seconds()
             tel['G_Long'] = np.gradient(tel['Speed_Smooth'] / 3.6, tel['TimeSec']) / 9.81
             
-            # Store in cache
             result = {"telemetry": tel, "lap_data": lap}
             self.telemetry_cache[cache_key] = result
             return result
