@@ -1,4 +1,4 @@
-# 🏎️ ApexBrain Enterprise | F1 Intelligence Platform
+# ApexBrain Enterprise | F1 Intelligence Platform
 
 **ApexBrain** is a production-grade telemetry and strategy analytics SaaS used for high-fidelity Formula 1 data analysis. It utilizes a micro-modular architecture to process FastF1 signals, run Monte Carlo simulations, and train XGBoost degradation models in real-time.
 
@@ -7,7 +7,7 @@
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 The system follows a **Hexagonal Architecture** pattern:
 
@@ -22,7 +22,7 @@ The system follows a **Hexagonal Architecture** pattern:
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 ### Option A: Docker (Production)
 The recommended way to run ApexBrain is via the containerized environment.
