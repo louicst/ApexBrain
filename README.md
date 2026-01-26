@@ -2,6 +2,9 @@
 
 **ApexBrain** is a production-grade telemetry and strategy analytics SaaS used for high-fidelity Formula 1 data analysis. It utilizes a micro-modular architecture to process FastF1 signals, run Monte Carlo simulations, and train XGBoost degradation models in real-time.
 
+The website is live on https://apexbrain-louis-castan-adrien-branchu.streamlit.app/
+Check the file Projet_Décision_F1_BRANCHU_Adrien_CASTAN_Louis.pdf to see the full math behind the project.
+
 ---
 
 ## 🏗️ Architecture
